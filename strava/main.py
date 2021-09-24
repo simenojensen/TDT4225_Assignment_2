@@ -13,6 +13,7 @@ import database
 
 
 import importlib
+
 importlib.reload(tables)
 importlib.reload(database)
 
@@ -22,6 +23,7 @@ from tables import DB_NAME
 from database import setup_database
 from database import insert_data
 from database import query_database
+
 
 def main():
     """Sets up the database and runs the program.
@@ -34,16 +36,17 @@ def main():
 
     # Prompt the user for their MySQL login inforamtion
     # user = input("Enter MySQL user: ")
-    user = 'root'
+    user = "root"
     # password = getpass.getpass(prompt="Enter MySQL password: ")
-    password = 'o#eR3GXCVFuDpThRNwhQH8w$1^7G'
+    password = "o#eR3GXCVFuDpThRNwhQH8w$1^7G"
 
     # create strava database
-    # setup_database(user, password, DB_NAME, TABLES)
-    # insert_data(user, password, DB_NAME)
+    setup_database(user, password, DB_NAME, TABLES)
+    insert_data(user, password, DB_NAME)
 
     # Perform queries
     query_database(user, password, DB_NAME)
+
 
 if __name__ == "__main__":
     main()

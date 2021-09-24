@@ -18,19 +18,19 @@ TABLES = {}
 # UserName was assumed to not necessarily be unique.
 TABLES["User"] = (
     "CREATE TABLE `User` ("
-    "  `id` varchar(3) NOT NULL,"
-    "  `has_labels` boolean NOT NULL,"
+    "  `id` VARCHAR(3) NOT NULL,"
+    "  `has_labels` BOOLEAN NOT NULL,"
     "  CONSTRAINT `User_PK` PRIMARY KEY (`id`)"
     ") ENGINE=InnoDB"
 )
 
 TABLES["Activity"] = (
     "CREATE TABLE `Activity` ("
-    "  `id` int NOT NULL,"
-    "  `user_id` varchar(3) NOT NULL,"
-    "  `transportation_mode` varchar(20),"
-    "  `start_date_time` datetime NOT NULL,"
-    "  `end_date_time` datetime NOT NULL,"
+    "  `id` INT NOT NULL,"
+    "  `user_id` VARCHAR(3) NOT NULL,"
+    "  `transportation_mode` VARCHAR(20),"
+    "  `start_date_time` DATETIME NOT NULL,"
+    "  `end_date_time` DATETIME NOT NULL,"
     "  CONSTRAINT `Activity_PK` PRIMARY KEY (`id`),"
     "  CONSTRAINT `Activity_FK` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`)"
     "          ON UPDATE CASCADE ON DELETE CASCADE"
@@ -39,13 +39,13 @@ TABLES["Activity"] = (
 
 TABLES["TrackPoint"] = (
     "CREATE TABLE `TrackPoint` ("
-    "  `id` int NOT NULL,"
-    "  `activity_id` int NOT NULL,"
-    "  `lat` double NOT NULL,"
-    "  `lon` double NOT NULL,"
-    "  `altitude` int,"
-    "  `date_days` double NOT NULL,"
-    "  `date_time` datetime NOT NULL,"
+    "  `id` INT NOT NULL,"
+    "  `activity_id` INT NOT NULL,"
+    "  `lat` DOUBLE NOT NULL,"
+    "  `lon` DOUBLE NOT NULL,"
+    "  `altitude` INT,"
+    "  `date_days` DOUBLE NOT NULL,"
+    "  `date_time` DATETIME NOT NULL,"
     "  CONSTRAINT `TrackPoint_PK` PRIMARY KEY (`id`),"
     "  CONSTRAINT `TrackPoint_FK` FOREIGN KEY (`activity_id`) REFERENCES `Activity` (`id`)"
     "          ON UPDATE CASCADE ON DELETE CASCADE"

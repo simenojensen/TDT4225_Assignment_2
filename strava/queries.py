@@ -3,7 +3,16 @@ from haversine import haversine_vector, Unit
 from tabulate import tabulate
 from sklearn.cluster import DBSCAN
 
+
 def query_1(cnx):
+    """Find answers to query 1 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query_a = """
               SELECT
                 COUNT(*) AS 'Number of Users'
@@ -26,9 +35,18 @@ def query_1(cnx):
     query_df = pd.read_sql_query(query_a, con=cnx)
     query_df = pd.concat([query_df, pd.read_sql_query(query_b, con=cnx)], axis=1)
     query_df = pd.concat([query_df, pd.read_sql_query(query_c, con=cnx)], axis=1)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_2(cnx):
+    """Find answers to query 2 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               AVG(user_activities) AS 'Average Number of Activities per User',
@@ -49,9 +67,18 @@ def query_2(cnx):
               ) AS T1
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_3(cnx):
+    """Find answers to query 3 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               user_id,
@@ -66,10 +93,19 @@ def query_3(cnx):
               10
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    query_df.rename(columns={'user_activities':'Number of Activities'}, inplace=True)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    query_df.rename(columns={"user_activities": "Number of Activities"}, inplace=True)
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_4(cnx):
+    """Find answers to query 4 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               COUNT(
@@ -81,9 +117,18 @@ def query_4(cnx):
               DATEDIFF(end_date_time, start_date_time) = 1
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_5(cnx):
+    """Find answers to query 5 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               user_id,
@@ -104,9 +149,20 @@ def query_5(cnx):
               AND COUNT(end_date_time) > 1
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_6(cnx):
+    """Find answers to query 6 by SQL queries. Use DBSCAN to first cluster on users
+    close in time. Then use DBSCAN again to cluster the results on users that
+    are close in space.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+
+    """
     query = """
             SELECT
               Activity.user_id,
@@ -122,30 +178,38 @@ def query_6(cnx):
     query_df = pd.read_sql_query(query, con=cnx)
 
     # Use DBSCAN to cluster on time
-    X = ((query_df['date_days'] - query_df['date_days'].min()) *24*60*60).values.reshape(-1,1)
-    eps = 60 # seconds
+    X = (
+        (query_df["date_days"] - query_df["date_days"].min()) * 24 * 60 * 60
+    ).values.reshape(-1, 1)
+    eps = 60  # seconds
     min_samples = 2
     cluster = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
-    query_df['time_labels'] = cluster.labels_
-    query_df = query_df.loc[query_df['time_labels'] != -1]
+    query_df["time_labels"] = cluster.labels_
+    query_df = query_df.loc[query_df["time_labels"] != -1]
 
     # Use DBSCAN again to cluster on distance using the haversine distance
     close_users = []
-    for tl in query_df['time_labels'].unique():
-        df = query_df.loc[query_df['time_labels'] == tl, ['user_id','activity_id','lat','lon']]
-        X = df[['lat','lon']].values
-        eps = 100 # meters
+    for tl in query_df["time_labels"].unique():
+        df = query_df.loc[
+            query_df["time_labels"] == tl, ["user_id", "activity_id", "lat", "lon"]
+        ]
+        X = df[["lat", "lon"]].values
+        eps = 100  # meters
         # divide by earth radius https://en.wikipedia.org/wiki/Earth_radius#Arithmetic_mean_radius
         eps = eps / 6371008.8
         min_samples = 2
         cluster = DBSCAN(eps=eps, min_samples=min_samples, metric="haversine").fit(X)
-        df['spatial_labels'] = cluster.labels_
-        df = df.loc[df['spatial_labels'] != -1]
+        df["spatial_labels"] = cluster.labels_
+        df = df.loc[df["spatial_labels"] != -1]
         # Get sets of users that are close to each other
-        df = df.groupby(['spatial_labels']).agg(user_id=pd.NamedAgg(column='user_id', aggfunc=frozenset))
-        df = df.loc[df['user_id'].map(len)>1] # must have minimum two users per spatial cluster
+        df = df.groupby(["spatial_labels"]).agg(
+            user_id=pd.NamedAgg(column="user_id", aggfunc=frozenset)
+        )
+        df = df.loc[
+            df["user_id"].map(len) > 1
+        ]  # must have minimum two users per spatial cluster
         # Only append unique sets for current iteration
-        close_users.append(df['user_id'].unique())
+        close_users.append(df["user_id"].unique())
 
     # Find all unique sets close users and remove empty arrays
     close_users = {s for arr in close_users if arr.size > 1 for s in arr}
@@ -153,7 +217,16 @@ def query_6(cnx):
     number_of_close_users = len([user for s in close_users for user in s])
     print(f"Number of close users: {number_of_close_users}")
 
+
 def query_7(cnx):
+    """Find answers to query 7 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               DISTINCT(id) AS 'User ID'
@@ -170,9 +243,18 @@ def query_7(cnx):
               )
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_8(cnx):
+    """Find answers to query 8 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               transportation_mode,
@@ -187,9 +269,19 @@ def query_8(cnx):
               transportation_mode
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_9(cnx):
+    """Find answers to query 9 by SQL queries. Use Pandas DataFrames to manipulate
+    the data in order to find the relevant results.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+
+    """
     query = """
             SELECT
               *
@@ -199,35 +291,70 @@ def query_9(cnx):
     query_df = pd.read_sql_query(query, con=cnx)
 
     # Create relevant time columns
-    query_df['month_diff'] = query_df['end_date_time'].apply(lambda x: x.month) - query_df['start_date_time'].apply(lambda x: x.month)
-    query_df['year_month'] = query_df['start_date_time'].apply(lambda x: x.year).astype(str) + '-' + query_df['start_date_time'].apply(lambda x: x.month_name())
-    query_df['recorded_hours'] = (query_df['end_date_time'] - query_df['start_date_time']).apply(lambda x: x.total_seconds() / 3600)
+    query_df["month_diff"] = query_df["end_date_time"].apply(
+        lambda x: x.month
+    ) - query_df["start_date_time"].apply(lambda x: x.month)
+    query_df["year_month"] = (
+        query_df["start_date_time"].apply(lambda x: x.year).astype(str)
+        + "-"
+        + query_df["start_date_time"].apply(lambda x: x.month_name())
+    )
+    query_df["recorded_hours"] = (
+        query_df["end_date_time"] - query_df["start_date_time"]
+    ).apply(lambda x: x.total_seconds() / 3600)
 
     # Find most active year-month
-    year_month_ma = query_df.groupby(['year_month']).count().sort_values(by='id', ascending=False).index[0]
+    year_month_ma = (
+        query_df.groupby(["year_month"])
+        .count()
+        .sort_values(by="id", ascending=False)
+        .index[0]
+    )
     # Find most active and second most active user in most active year-month
-    ma_df = query_df.loc[query_df['year_month'] == year_month_ma].groupby(['user_id']).count().sort_values(by='id', ascending=False)
+    ma_df = (
+        query_df.loc[query_df["year_month"] == year_month_ma]
+        .groupby(["user_id"])
+        .count()
+        .sort_values(by="id", ascending=False)
+    )
     user_ma_1 = ma_df.index[0]
-    num_act_1 = ma_df['id'][0]
+    num_act_1 = ma_df["id"][0]
     user_ma_2 = ma_df.index[1]
-    num_act_2 = ma_df['id'][1]
+    num_act_2 = ma_df["id"][1]
 
     # Select subset of data for most active and second most active user in
     # most active year-month
-    query_df = query_df.loc[(query_df['year_month'] == year_month_ma) & (query_df['user_id'].isin([user_ma_1, user_ma_2]))]
+    query_df = query_df.loc[
+        (query_df["year_month"] == year_month_ma)
+        & (query_df["user_id"].isin([user_ma_1, user_ma_2]))
+    ]
 
     # Assert that these users did not record any activities that started in
     # one month and ended in another
-    assert all(query_df['month_diff'] == 0)
+    assert all(query_df["month_diff"] == 0)
 
     # Create dataframe for number of activities and number of hours logged
-    result_df = query_df.groupby(['user_id']).agg(recorded_hours=pd.NamedAgg(column='recorded_hours',aggfunc=sum)).reset_index()
-    d = {user_ma_1:num_act_1, user_ma_2:num_act_2}
-    result_df['number_of_activities'] = result_df['user_id'].map(d)
-    result_df['year_month'] = year_month_ma
-    print(tabulate(result_df, headers='keys', showindex=False, tablefmt='psql'))
+    result_df = (
+        query_df.groupby(["user_id"])
+        .agg(recorded_hours=pd.NamedAgg(column="recorded_hours", aggfunc=sum))
+        .reset_index()
+    )
+    d = {user_ma_1: num_act_1, user_ma_2: num_act_2}
+    result_df["number_of_activities"] = result_df["user_id"].map(d)
+    result_df["year_month"] = year_month_ma
+    print(tabulate(result_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_10(cnx):
+    """Find answers to query 10 by SQL queries. Use Pandas DataFrames to sum the
+    distance using the haversine Python package.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+
+    """
     query = """
             SELECT
               TrackPoint.activity_id,
@@ -243,13 +370,26 @@ def query_10(cnx):
             """
     query_df = pd.read_sql_query(query, con=cnx)
     distance_walked = 0
-    for aid in query_df['activity_id'].unique():
-        df = query_df.loc[query_df['activity_id']==aid].copy()
-        df['dist'] = haversine_vector(df[['lat','lon']].values, df[['lat','lon']].shift().values, Unit.KILOMETERS)
-        distance_walked += df['dist'].sum()
+    for aid in query_df["activity_id"].unique():
+        df = query_df.loc[query_df["activity_id"] == aid].copy()
+        df["dist"] = haversine_vector(
+            df[["lat", "lon"]].values,
+            df[["lat", "lon"]].shift().values,
+            Unit.KILOMETERS,
+        )
+        distance_walked += df["dist"].sum()
     print(f"Total distance walked: {distance_walked}")
 
+
 def query_11(cnx):
+    """Find answers to query 11 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               user_id,
@@ -290,9 +430,18 @@ def query_11(cnx):
               20;
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+
 
 def query_12(cnx):
+    """Find answers to query 12 by SQL queries. Results are places in single Pandas
+    DataFrame, and printed.
+
+    Parameters
+    ----------
+    cnx : :obj:
+        The sqlalchemy connection object.
+    """
     query = """
             SELECT
               user_id,
@@ -333,4 +482,4 @@ def query_12(cnx):
               number_of_invalid_activities DESC
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers='keys', showindex=False, tablefmt='psql'))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
