@@ -11,8 +11,13 @@
 ** Requirements
 - [[https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz][MySQL]] (>= 8.0)
 
-See =tdt4225.yml= for python packages.
-For installation with =conda=:
+See =tdt4225.yml= for python packages. For installation with =conda=:
 #+begin_src bash
   conda env create -f tdt4225.yml
+#+end_src
+
+* Usage
+#+begin_src bash
+  cd TDT4225_Assignment_2/strava
+  python main.py
 #+end_src

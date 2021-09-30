@@ -3,7 +3,8 @@
 
 This module contains code that creates the `TDT4225ProjectGroup78` database,
 creates the tables of the `TDT4225ProjectGroup78` database, and fills the
-database with data.
+database with data. Also provides an interface to queries performed on the
+database.
 
 """
 import os
@@ -15,13 +16,7 @@ from mysql import connector
 from mysql.connector import errorcode
 from sqlalchemy import create_engine
 import pymysql
-
 import queries
-
-import importlib
-
-importlib.reload(queries)
-
 
 def create_database(cursor, DB_NAME):
     """Helper function to create database.
@@ -102,7 +97,17 @@ def setup_database(user, password, DB_NAME, TABLES):
 
 
 def parse_data():
+    """Parse data from `.plt` files into Pandas DataFrames.
 
+    Returns
+    -------
+    user_df : Pandas DataFrame
+        Table of user information.
+    activity_df : Pandas DataFrame
+        Table of activity information.
+    trackpoint_df : Pandas DataFrame
+        Table of trackpoint information.
+    """
     # Load user data into Pandas DataFrame
     user_ids = sorted(os.listdir("../dataset/Data/"))
     # Find labeled users
@@ -283,6 +288,17 @@ def insert_data(user, password, DB_NAME):
 
 
 def query_database(user, password, DB_NAME):
+    """Call the different query functions.
+
+    Parameters
+    ----------
+    user : str
+        The entered MySQL user
+    password : str
+        The entered MySQL password
+    DB_NAME : str
+        The MySQL database name (`TDT4225ProjectGroup78`)
+    """
 
     # Instantiate connection
     with create_engine(

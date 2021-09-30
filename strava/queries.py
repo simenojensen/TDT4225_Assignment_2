@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""Code to perform queries on the `TDT4225ProjectGroup78` database.
+
+This module contains code that queries the `TDT4225ProjectGroup78` database, to
+answer the questions given in the assignment text. The results are then printed
+to the console.
+
+"""
+
 import pandas as pd
 from haversine import haversine_vector, Unit
 from tabulate import tabulate
@@ -35,7 +44,7 @@ def query_1(cnx):
     query_df = pd.read_sql_query(query_a, con=cnx)
     query_df = pd.concat([query_df, pd.read_sql_query(query_b, con=cnx)], axis=1)
     query_df = pd.concat([query_df, pd.read_sql_query(query_c, con=cnx)], axis=1)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_2(cnx):
@@ -67,7 +76,7 @@ def query_2(cnx):
               ) AS T1
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_3(cnx):
@@ -93,8 +102,8 @@ def query_3(cnx):
               10
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    query_df.rename(columns={"user_activities": "Number of Activities"}, inplace=True)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    query_df = query_df.rename(columns={"user_activities": "Number of Activities"})
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_4(cnx):
@@ -117,7 +126,7 @@ def query_4(cnx):
               DATEDIFF(end_date_time, start_date_time) = 1
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_5(cnx):
@@ -149,7 +158,7 @@ def query_5(cnx):
               AND COUNT(end_date_time) > 1
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_6(cnx):
@@ -243,7 +252,10 @@ def query_7(cnx):
               )
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    values = query_df.values.reshape((-1, 4), order='F')
+    cols = ['user_id'] * 4
+    query_df = pd.DataFrame(data=values, columns=cols)
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_8(cnx):
@@ -269,7 +281,7 @@ def query_8(cnx):
               transportation_mode
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_9(cnx):
@@ -342,7 +354,7 @@ def query_9(cnx):
     d = {user_ma_1: num_act_1, user_ma_2: num_act_2}
     result_df["number_of_activities"] = result_df["user_id"].map(d)
     result_df["year_month"] = year_month_ma
-    print(tabulate(result_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(result_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_10(cnx):
@@ -430,7 +442,7 @@ def query_11(cnx):
               20;
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))
 
 
 def query_12(cnx):
@@ -482,4 +494,4 @@ def query_12(cnx):
               number_of_invalid_activities DESC
             """
     query_df = pd.read_sql_query(query, con=cnx)
-    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="psql"))
+    print(tabulate(query_df, headers="keys", showindex=False, tablefmt="orgtbl"))

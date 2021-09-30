@@ -11,11 +11,9 @@ named `TABLES`.
 # Name of database
 DB_NAME = "TDT4225ProjectGroup78"
 
-
 # dict of the MySQL tables, their fields and their constraints.
 TABLES = {}
 
-# UserName was assumed to not necessarily be unique.
 TABLES["User"] = (
     "CREATE TABLE `User` ("
     "  `id` VARCHAR(3) NOT NULL,"

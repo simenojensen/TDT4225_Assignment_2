@@ -11,34 +11,25 @@ import getpass
 import tables
 import database
 
-
-import importlib
-
-importlib.reload(tables)
-importlib.reload(database)
-
-
 from tables import TABLES
 from tables import DB_NAME
 from database import setup_database
 from database import insert_data
 from database import query_database
 
-
 def main():
     """Sets up the database and runs the program.
 
     Program prompts user for their MySQL login information. A database called
     `TDT4225ProjectGroup78` is created and filled with data from the `.plt`
-    files in the `dataset` folder.
+    files in the `dataset` folder. The program then queries the database to
+    answer the questions found in the assignment text.
 
     """
 
     # Prompt the user for their MySQL login inforamtion
-    # user = input("Enter MySQL user: ")
-    user = "root"
-    # password = getpass.getpass(prompt="Enter MySQL password: ")
-    password = "o#eR3GXCVFuDpThRNwhQH8w$1^7G"
+    user = input("Enter MySQL user: ")
+    password = getpass.getpass(prompt="Enter MySQL password: ")
 
     # create strava database
     setup_database(user, password, DB_NAME, TABLES)
