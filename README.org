@@ -9,7 +9,7 @@ Install [[https://git-lfs.github.com/][git lfs]] if not already installed.
 
 #+begin_src bash
   brew install git-lfs
-  git lfs instal # setup git lfsl
+  git lfs instal # setup git lfs
 #+end_src
 
 Clone the repository.
