@@ -9,8 +9,6 @@
   git clone https://github.com/simenojensen/TDT4225_Assignment_2.git
 #+end_src
 
-Download dataset from [[https://www.dropbox.com/l/scl/AABWtkQo31veHrXpTKSQ43bEabiHBZ5OqkA][here]], and unzip the data.
-
 ** Requirements
 - [[https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz][MySQL]] (>= 8.0)
 
