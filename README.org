@@ -9,6 +9,12 @@ Install [[https://git-lfs.github.com/][git lfs]] if not already installed.
 
 #+begin_src bash
   brew install git-lfs
+  git lfs instal # setup git lfsl
+#+end_src
+
+Clone the repository.
+
+#+begin_src bash
   git clone https://github.com/simenojensen/TDT4225_Assignment_2.git
 #+end_src
 
