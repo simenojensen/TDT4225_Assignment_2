@@ -5,12 +5,18 @@
 
 
 * Installation
+Install [[https://git-lfs.github.com/][git lfs]] if not already installed.
+
 #+begin_src bash
+  brew install git-lfs
   git clone https://github.com/simenojensen/TDT4225_Assignment_2.git
 #+end_src
 
+Unzip the ~dataset.zip~ file.
+
 ** Requirements
-- [[https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz][MySQL]] (>= 8.0)
+- [[https://git-lfs.github.com/][git lfs]]
+- [[https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.23.tar.gz][MySQL]] (>= 8.0.26)
 
 See =tdt4225.yml= for python packages. For installation with =conda=:
 #+begin_src bash
