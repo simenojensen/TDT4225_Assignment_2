@@ -246,7 +246,7 @@ def insert_data(user, password, DB_NAME):
 
     start_time = time.time()
     user_df, activity_df, trackpoint_df = parse_data()
-    print(f"Data parsed successfully. Time taken: {time.time() - start_time:.2f}")
+    print(f"Data parsed successfully. Time taken: {time.time() - start_time:.2f} seconds")
 
     # Instantiate connection
     with create_engine(
